@@ -1,13 +1,7 @@
 package ru.mail.polis.service.stasyanoi;
 
 import com.google.common.net.HttpHeaders;
-import one.nio.http.HttpServer;
-import one.nio.http.HttpServerConfig;
-import one.nio.http.Param;
-import one.nio.http.Path;
-import one.nio.http.Request;
-import one.nio.http.RequestMethod;
-import one.nio.http.Response;
+import one.nio.http.*;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.dao.DAO;
 
@@ -44,27 +38,31 @@ public class CustomServer extends HttpServer {
         Response responseHttp;
         //check id param
         if (idParam == null || idParam.isEmpty()) {
-            responseHttp = new Response(Response.BAD_REQUEST);
-            responseHttp.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
+            responseHttp = getResponseWithNoBody(Response.BAD_REQUEST);
         } else {
 
             //get id as aligned byte buffer
             final ByteBuffer id = fromBytes(idParam.getBytes(StandardCharsets.UTF_8));
             //get the response from db
-            ByteBuffer body;
             try {
-                body = dao.get(id);
+                final ByteBuffer body = dao.get(id);
                 final byte[] bytes = toBytes(body);
                 responseHttp = Response.ok(bytes);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchElementException e) {
                 //if not found then 404
-                responseHttp = new Response(Response.NOT_FOUND);
-                responseHttp.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
+                responseHttp = getResponseWithNoBody(Response.NOT_FOUND);
             }
         }
 
+        return responseHttp;
+    }
+
+    @NotNull
+    private Response getResponseWithNoBody(final String requestType) {
+        final Response responseHttp = new Response(requestType);
+        responseHttp.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
         return responseHttp;
     }
 
@@ -101,15 +99,12 @@ public class CustomServer extends HttpServer {
 
         Response responseHttp;
         if (idParam == null || idParam.isEmpty()) {
-            responseHttp = new Response(Response.BAD_REQUEST);
-            responseHttp.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
+            responseHttp = getResponseWithNoBody(Response.BAD_REQUEST);
         } else {
-
             final ByteBuffer key = fromBytes(idParam.getBytes(StandardCharsets.UTF_8));
             final ByteBuffer value = fromBytes(request.getBody());
             dao.upsert(key, value);
-            responseHttp = new Response(Response.CREATED);
-            responseHttp.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
+            responseHttp = getResponseWithNoBody(Response.CREATED);
         }
 
         return responseHttp;
@@ -129,28 +124,26 @@ public class CustomServer extends HttpServer {
         Response responseHttp;
 
         if (idParam == null || idParam.isEmpty()) {
-            responseHttp = new Response(Response.BAD_REQUEST);
-            responseHttp.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
+            responseHttp = getResponseWithNoBody(Response.BAD_REQUEST);
         } else {
             final ByteBuffer key = fromBytes(idParam.getBytes(StandardCharsets.UTF_8));
             dao.remove(key);
-            responseHttp = new Response(Response.ACCEPTED);
-            responseHttp.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
+            responseHttp = getResponseWithNoBody(Response.ACCEPTED);
         }
         return responseHttp;
     }
 
     /**
-     * Abracadabra check.
+     * Default handler for unmapped requests.
      *
-     * @return Response with status.
+     * @param request - unmapped request
+     * @param session - session object
+     * @throws IOException - if input|output exceptions occur within the method
      */
-    @Path("/abracadabra")
-    @RequestMethod(METHOD_GET)
-    public Response abracadabra() {
-        final Response response = new Response(Response.BAD_REQUEST);
-        response.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
-        return response;
+    @Override
+    public void handleDefault(final Request request, final HttpSession session) throws IOException {
+        final Response response = getResponseWithNoBody(Response.BAD_REQUEST);
+        session.sendResponse(response);
     }
 
     /**
@@ -161,9 +154,7 @@ public class CustomServer extends HttpServer {
     @Path("/v0/status")
     @RequestMethod(METHOD_GET)
     public Response status() {
-        final Response response = new Response(Response.OK);
-        response.addHeader(HttpHeaders.CONTENT_LENGTH + ": " + 0);
-        return response;
+        return getResponseWithNoBody(Response.OK);
     }
 
     @Override
