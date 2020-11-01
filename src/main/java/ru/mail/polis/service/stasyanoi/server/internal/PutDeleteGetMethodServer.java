@@ -15,12 +15,19 @@ import java.util.Set;
 
 public class PutDeleteGetMethodServer extends DeleteGetMethodServer {
 
+    /**
+     * Put server.
+     *
+     * @param dao - dao.
+     * @param config - config.
+     * @param topology - topology.
+     * @throws IOException - IO.
+     */
     public PutDeleteGetMethodServer(final DAO dao,
                                     final HttpServerConfig config,
                                     final Set<String> topology) throws IOException {
         super(dao, config, topology);
     }
-
 
     /**
      * Get put replicas.

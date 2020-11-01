@@ -29,8 +29,14 @@ public class ConstantsServer extends HttpServer {
     protected Map<String, HttpClient> httpClientMap;
     protected java.net.http.HttpClient asyncHttpClient;
 
-
-
+    /**
+     * Create base server.
+     *
+     * @param dao - dao.
+     * @param config - config.
+     * @param topology - topology
+     * @throws IOException - if IO exceptions occurs.
+     */
     public ConstantsServer(final DAO dao,
                            final HttpServerConfig config,
                            final Set<String> topology) throws IOException {

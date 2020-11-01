@@ -25,6 +25,14 @@ import java.util.stream.Collectors;
 
 public class GetMethodServer extends ConstantsServer {
 
+    /**
+     * Get server.
+     *
+     * @param dao - dao.
+     * @param config - config.
+     * @param topology - topology
+     * @throws IOException - IO.
+     */
     public GetMethodServer(final DAO dao,
                            final HttpServerConfig config,
                            final Set<String> topology) throws IOException {
