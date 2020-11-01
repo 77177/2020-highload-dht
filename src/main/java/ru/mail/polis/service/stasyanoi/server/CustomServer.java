@@ -290,7 +290,7 @@ public class CustomServer extends FrameServer {
                                  final Map<Integer, String> nodeMapping)
             throws IOException {
         try {
-            HttpClient httpClient = httpClientMap.get(nodeMapping.get(node));
+            final HttpClient httpClient = httpClientMap.get(nodeMapping.get(node));
             return httpClient.invoke(request);
         } catch (InterruptedException | PoolException | HttpException e) {
             return Util.responseWithNoBody(Response.INTERNAL_ERROR);
