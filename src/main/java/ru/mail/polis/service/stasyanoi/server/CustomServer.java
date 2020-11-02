@@ -46,15 +46,17 @@ public class CustomServer extends FrameServer {
     @Path("/v0/entity")
     @RequestMethod(Request.METHOD_GET)
     public void get(final @Param("id") String idParam, final HttpSession session, final Request request) {
-        executorService.execute(() -> {
-            try {
-                getInternal(idParam, session, request);
-            } catch (IOException e) {
-                Util.sendErrorInternal(session, e);
-            } catch (RejectedExecutionException e) {
-                Util.send503Error(session);
-            }
-        });
+        try {
+            executorService.execute(() -> {
+                try {
+                    getInternal(idParam, session, request);
+                } catch (IOException e) {
+                    Util.sendErrorInternal(session, e);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            Util.send503Error(session);
+        }
     }
 
     /**
@@ -66,15 +68,17 @@ public class CustomServer extends FrameServer {
     @Path("/v0/entity/rep")
     @RequestMethod(Request.METHOD_GET)
     public void getRep(final @Param("id") String idParam, final HttpSession session) {
-        executorService.execute(() -> {
-            try {
-                getRepInternal(idParam, session);
-            } catch (IOException e) {
-                Util.sendErrorInternal(session, e);
-            } catch (RejectedExecutionException e) {
-                Util.send503Error(session);
-            }
-        });
+        try {
+            executorService.execute(() -> {
+                try {
+                    getRepInternal(idParam, session);
+                } catch (IOException e) {
+                    Util.sendErrorInternal(session, e);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            Util.send503Error(session);
+        }
     }
 
     private void getRepInternal(final String idParam, final HttpSession session) throws IOException {
@@ -126,15 +130,19 @@ public class CustomServer extends FrameServer {
     @Path("/v0/entity")
     @RequestMethod(Request.METHOD_PUT)
     public void put(final @Param("id") String idParam, final Request request, final HttpSession session) {
-        executorService.execute(() -> {
-            try {
-                putInternal(idParam, request, session);
-            } catch (IOException e) {
-                Util.sendErrorInternal(session, e);
-            } catch (RejectedExecutionException e) {
-                Util.send503Error(session);
-            }
-        });
+        try {
+            executorService.execute(() -> {
+                try {
+                    putInternal(idParam, request, session);
+                } catch (IOException e) {
+                    Util.sendErrorInternal(session, e);
+                } catch (RejectedExecutionException e) {
+                    Util.send503Error(session);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            Util.send503Error(session);
+        }
     }
 
     /**
@@ -147,15 +155,17 @@ public class CustomServer extends FrameServer {
     @Path("/v0/entity/rep")
     @RequestMethod(Request.METHOD_PUT)
     public void putRep(final @Param("id") String idParam, final Request request, final HttpSession session) {
-        executorService.execute(() -> {
-            try {
-                putRepInternal(idParam, request, session);
-            } catch (IOException e) {
-                Util.sendErrorInternal(session, e);
-            } catch (RejectedExecutionException e) {
-                Util.send503Error(session);
-            }
-        });
+        try {
+            executorService.execute(() -> {
+                try {
+                    putRepInternal(idParam, request, session);
+                } catch (IOException e) {
+                    Util.sendErrorInternal(session, e);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            Util.send503Error(session);
+        }
     }
 
     private void putRepInternal(final String idParam, final Request request,
@@ -214,15 +224,17 @@ public class CustomServer extends FrameServer {
     @Path("/v0/entity")
     @RequestMethod(Request.METHOD_DELETE)
     public void delete(final @Param("id") String idParam, final Request request, final HttpSession session) {
-        executorService.execute(() -> {
-            try {
-                deleteInternal(idParam, request, session);
-            } catch (IOException e) {
-                Util.sendErrorInternal(session, e);
-            } catch (RejectedExecutionException e) {
-                Util.send503Error(session);
-            }
-        });
+        try {
+            executorService.execute(() -> {
+                try {
+                    deleteInternal(idParam, request, session);
+                } catch (IOException e) {
+                    Util.sendErrorInternal(session, e);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            Util.send503Error(session);
+        }
     }
 
     /**
@@ -234,15 +246,17 @@ public class CustomServer extends FrameServer {
     @Path("/v0/entity/rep")
     @RequestMethod(Request.METHOD_DELETE)
     public void deleteRep(final @Param("id") String idParam, final HttpSession session) {
-        executorService.execute(() -> {
-            try {
-                deleteRepInternal(idParam, session);
-            } catch (IOException e) {
-                Util.sendErrorInternal(session, e);
-            } catch (RejectedExecutionException e) {
-                Util.send503Error(session);
-            }
-        });
+        try {
+            executorService.execute(() -> {
+                try {
+                    deleteRepInternal(idParam, session);
+                } catch (IOException e) {
+                    Util.sendErrorInternal(session, e);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            Util.send503Error(session);
+        }
     }
 
     private void deleteRepInternal(final String idParam, final HttpSession session) throws IOException {
