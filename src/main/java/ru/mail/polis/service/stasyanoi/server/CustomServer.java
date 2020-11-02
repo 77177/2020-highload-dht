@@ -219,6 +219,8 @@ public class CustomServer extends FrameServer {
                 deleteInternal(idParam, request, session);
             } catch (IOException e) {
                 Util.sendErrorInternal(session, e);
+            } catch (RejectedExecutionException e) {
+                Util.send503Error(session);
             }
         });
     }
