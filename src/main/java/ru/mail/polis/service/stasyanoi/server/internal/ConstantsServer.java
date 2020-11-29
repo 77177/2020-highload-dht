@@ -4,60 +4,52 @@ import one.nio.http.HttpClient;
 import one.nio.http.HttpServer;
 import one.nio.http.HttpServerConfig;
 import one.nio.net.ConnectionString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mail.polis.dao.DAO;
 import ru.mail.polis.service.stasyanoi.CustomExecutor;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 public class ConstantsServer extends HttpServer {
 
-    protected static final String TRUE_VAL = "true";
-    protected static final String REPS = "reps";
-    protected final List<String> replicationDefaults = Arrays.asList("1/1", "2/2", "2/3", "3/4", "3/5");
-    protected Map<Integer, String> nodeMapping;
-    protected int nodeCount;
-    protected int nodeNum;
-    protected DAO dao;
+    protected final Map<Integer, String> nodeIndexToUrlMapping;
+    protected final int nodeAmount;
+    protected int thisNodeIndex;
+    protected final DAO dao;
     protected CustomExecutor executorService = CustomExecutor.getExecutor();
-    protected Map<String, HttpClient> httpClientMap;
-    protected java.net.http.HttpClient asyncHttpClient;
+    protected final Map<String, HttpClient> httpClientMap = new HashMap<>();
+    protected final Logger logger = LoggerFactory.getLogger(ConstantsServer.class);
 
     /**
-     * Create base server.
+     * Fields server.
      *
      * @param dao - dao.
      * @param config - config.
-     * @param topology - topology
-     * @throws IOException - if IO exceptions occurs.
+     * @param topology - topology.
+     * @throws IOException - IOException.
      */
-    public ConstantsServer(final DAO dao,
-                           final HttpServerConfig config,
-                           final Set<String> topology) throws IOException {
+    public ConstantsServer(final DAO dao, final HttpServerConfig config, final Set<String> topology)
+            throws IOException {
         super(config);
-        this.nodeCount = topology.size();
+        this.nodeAmount = topology.size();
         final ArrayList<String> urls = new ArrayList<>(topology);
         urls.sort(String::compareTo);
 
-        final Map<Integer, String> nodeMappingTemp = new TreeMap<>();
-        final Map<String, HttpClient> clients = new HashMap<>();
+        this.nodeIndexToUrlMapping = new TreeMap<>();
 
-        asyncHttpClient = java.net.http.HttpClient.newHttpClient();
         for (int i = 0; i < urls.size(); i++) {
-            nodeMappingTemp.put(i, urls.get(i));
-            clients.put(urls.get(i), new HttpClient(new ConnectionString(urls.get(i))));
-            if (urls.get(i).contains(String.valueOf(super.port))) {
-                nodeNum = i;
+            nodeIndexToUrlMapping.put(i, urls.get(i));
+            httpClientMap.put(urls.get(i), new HttpClient(new ConnectionString(urls.get(i))));
+            if (urls.get(i).endsWith(String.valueOf(super.port))) {
+                thisNodeIndex = i;
             }
         }
-        this.httpClientMap = clients;
-        this.nodeMapping = nodeMappingTemp;
         this.dao = dao;
     }
 }
